@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, ChevronDown, ChevronRight, Check, BookOpen, Download } from 'lucide-react';
+import { ArrowLeft, Search, ChevronDown, ChevronRight, Check, BookOpen, Download, ChevronUp, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import { getKnowledgeTree, categories } from '../data/knowledgePoints';
 import { toggleKnowledgePoint, isCompleted } from '../utils/storage';
 
@@ -10,6 +10,8 @@ export default function DetailPage({ onBack, data, onProgressChange }) {
   const [expandedSubCategories, setExpandedSubCategories] = useState(new Set());
   const [selectedKnowledge, setSelectedKnowledge] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showScrollButtons, setShowScrollButtons] = useState(false);
+  const sidebarRef = useRef(null);
 
   const tree = getKnowledgeTree(data);
 
@@ -20,6 +22,39 @@ export default function DetailPage({ onBack, data, onProgressChange }) {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sidebarRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = sidebarRef.current;
+        setShowScrollButtons(scrollHeight > clientHeight);
+      }
+    };
+
+    const sidebar = sidebarRef.current;
+    if (sidebar) {
+      sidebar.addEventListener('scroll', handleScroll);
+      handleScroll();
+    }
+
+    return () => {
+      if (sidebar) {
+        sidebar.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [expandedCategories, expandedSubCategories]);
+
+  const scrollToTop = () => {
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollTo({ top: sidebarRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  };
 
   const handleCategoryToggle = category => {
     const newSet = new Set(expandedCategories);
@@ -122,7 +157,7 @@ export default function DetailPage({ onBack, data, onProgressChange }) {
               animate={{ x: 0 }}
               exit={{ x: -250 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-64 md:w-72 bg-white shadow-lg flex-shrink-0 flex flex-col overflow-hidden"
+              className="w-64 md:w-72 bg-white shadow-lg flex-shrink-0 flex flex-col overflow-hidden relative"
             >
               <div className="p-4 border-b">
                 <div className="relative">
@@ -137,7 +172,7 @@ export default function DetailPage({ onBack, data, onProgressChange }) {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-2">
+              <div ref={sidebarRef} className="flex-1 overflow-y-auto p-2 scroll-smooth">
                 {Object.keys(filteredTree).length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -229,6 +264,32 @@ export default function DetailPage({ onBack, data, onProgressChange }) {
                   ))
                 )}
               </div>
+
+              <AnimatePresence>
+                {showScrollButtons && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute bottom-4 right-4 flex flex-col gap-2 z-10"
+                  >
+                    <button
+                      onClick={scrollToTop}
+                      className="w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 hover:shadow-lg transition-all"
+                      title="滚动到顶部"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={scrollToBottom}
+                      className="w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 hover:shadow-lg transition-all"
+                      title="滚动到底部"
+                    >
+                      <ChevronDownIcon className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.aside>
           )}
         </AnimatePresence>
