@@ -9,6 +9,23 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# 静态资源直接放行，不经过 SPA 重定向
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/knowledge/*"
+  to = "/knowledge/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/vite.svg"
+  to = "/vite.svg"
+  status = 200
+
+# SPA fallback：其余所有路径交给 React Router 处理
 [[redirects]]
   from = "/*"
   to = "/index.html"
