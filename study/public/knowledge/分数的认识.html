@@ -136,16 +136,16 @@
       numOptions.slice(0, 4).forEach(opt => {
         const el = document.createElement('div')
         el.className = 'fraction-option'
-        el.draggable = true
         el.textContent = opt
         el.id = 'num-' + opt
-        el.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('type', 'numerator')
-          e.dataTransfer.setData('val', opt)
-          el.style.opacity = '0.5'
-        })
-        el.addEventListener('dragend', () => {
-          el.style.opacity = '1'
+        el.style.cursor = 'pointer'
+        el.addEventListener('click', () => {
+          selectedNumerator = opt
+          numeratorEl.textContent = opt
+          numeratorEl.style.color = opt === currentNumerator ? 'var(--correct)' : 'var(--wrong)'
+          document.querySelectorAll('#numeratorOptions .fraction-option').forEach(e => e.style.outline = 'none')
+          el.style.outline = '3px solid var(--accent2)'
+          if (selectedDenominator !== null) checkAnswer()
         })
         numeratorOptions.appendChild(el)
       })
@@ -163,16 +163,16 @@
       denOptions.slice(0, 4).forEach(opt => {
         const el = document.createElement('div')
         el.className = 'fraction-option'
-        el.draggable = true
         el.textContent = opt
         el.id = 'den-' + opt
-        el.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('type', 'denominator')
-          e.dataTransfer.setData('val', opt)
-          el.style.opacity = '0.5'
-        })
-        el.addEventListener('dragend', () => {
-          el.style.opacity = '1'
+        el.style.cursor = 'pointer'
+        el.addEventListener('click', () => {
+          selectedDenominator = opt
+          denominatorEl.textContent = opt
+          denominatorEl.style.color = opt === currentDenominator ? 'var(--correct)' : 'var(--wrong)'
+          document.querySelectorAll('#denominatorOptions .fraction-option').forEach(e => e.style.outline = 'none')
+          el.style.outline = '3px solid var(--accent2)'
+          if (selectedNumerator !== null) checkAnswer()
         })
         denominatorOptions.appendChild(el)
       })
@@ -206,43 +206,7 @@
       }
     }
     
-    numeratorEl.addEventListener('dragover', e => e.preventDefault())
-    numeratorEl.addEventListener('drop', e => {
-      e.preventDefault()
-      const type = e.dataTransfer.getData('type')
-      const val = parseInt(e.dataTransfer.getData('val'))
-      
-      if (type === 'numerator') {
-        selectedNumerator = val
-        numeratorEl.textContent = val
-        if (selectedNumerator === currentNumerator) {
-          numeratorEl.style.color = 'var(--correct)'
-        }
-      }
-      
-      if (selectedNumerator !== null && selectedDenominator !== null) {
-        checkAnswer()
-      }
-    })
-    
-    denominatorEl.addEventListener('dragover', e => e.preventDefault())
-    denominatorEl.addEventListener('drop', e => {
-      e.preventDefault()
-      const type = e.dataTransfer.getData('type')
-      const val = parseInt(e.dataTransfer.getData('val'))
-      
-      if (type === 'denominator') {
-        selectedDenominator = val
-        denominatorEl.textContent = val
-        if (selectedDenominator === currentDenominator) {
-          denominatorEl.style.color = 'var(--correct)'
-        }
-      }
-      
-      if (selectedNumerator !== null && selectedDenominator !== null) {
-        checkAnswer()
-      }
-    })
+    // Click-based selection: user clicks numerator option, then denominator option
     
     function nextQuestion() {
       generateQuestion()

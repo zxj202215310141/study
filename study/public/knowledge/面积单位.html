@@ -94,23 +94,28 @@
     }
     
     function initGacha() {
-      gacha.innerHTML = `
-        <div class="question" id="question">点击扭蛋开始！</div>
-        <div class="gacha-ball" style="background:#e17055;left:20%;top:50%">🔴</div>
-        <div class="gacha-ball" style="background:#00b894;left:45%;top:60%">🟢</div>
-        <div class="gacha-ball" style="background:#0984e3;left:70%;top:50%">🔵</div>
-      `
-      
-      const balls = document.querySelectorAll('.gacha-ball')
+      // Keep existing DOM elements, update via references
+      const balls = gacha.querySelectorAll('.gacha-ball')
       balls.forEach(ball => {
+        ball.classList.remove('selected')
+        ball.style.transform = ''
+        ball.style.display = ''
+        ball.replaceWith(ball.cloneNode(true)) // Remove old event listeners
+      })
+      // Re-bind events
+      gacha.querySelectorAll('.gacha-ball').forEach(ball => {
         ball.addEventListener('click', () => {
           ball.classList.add('selected')
           ball.style.transform = 'scale(0)'
           setTimeout(() => {
+            ball.style.display = 'none'
             generateQuestion()
           }, 500)
         })
       })
+      questionEl.textContent = '点击扭蛋开始！'
+      windowEl.innerHTML = '获得的答案：'
+      optionsEl.style.display = 'none'
     }
     
     function generateQuestion() {

@@ -122,8 +122,8 @@
 
       numberPool.innerHTML = ''
       // Ensure the correct answer is always in the pool
-      const pool = [correct]
-      const remaining = numbers.filter(n => n !== correct)
+      const pool = [currentAnswer]
+      const remaining = numbers.filter(n => n !== currentAnswer)
       shuffle(remaining)
       pool.push(...remaining.slice(0, 5))
       shuffle(pool)

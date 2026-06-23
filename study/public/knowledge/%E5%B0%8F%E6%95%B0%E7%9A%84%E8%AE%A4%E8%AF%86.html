@@ -98,7 +98,7 @@
         const char = numStr[i]
         const el = document.createElement('div')
         
-        if (char === '.') {
+        if (char === '.' || char === ' ') {
           el.className = 'point-slot'
           el.dataset.type = 'point'
         } else {
